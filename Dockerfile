@@ -25,6 +25,8 @@ RUN ln -fs /usr/bin/python3 /usr/bin/python
 RUN \
   git clone --branch $VERSION --depth 1 https://github.com/openstack/horizon.git ${HORIZON_BASEDIR} && \
   cd /opt && \
+  git clone --branch master --depth 1 https://github.com/smiclea/openstack-dashboard-cloudbase-theme && \
+  cp -r openstack-dashboard-cloudbase-theme/theme/cloudbase horizon/openstack_dashboard/themes/ && \
   python3 -m pip install -c https://raw.githubusercontent.com/ader1990/requirements/${VERSION}/upper-constraints.txt ./horizon && \
   cd ${HORIZON_BASEDIR} && \
   python3 -m pip install python-memcached && \
@@ -38,6 +40,7 @@ RUN \
     >> $HORIZON_BASEDIR/openstack_dashboard/local/local_settings.py && \
   printf  "\nSESSION_ENGINE = 'django.contrib.sessions.backends.cache'\n" >> $HORIZON_BASEDIR/openstack_dashboard/local/local_settings.py && \
   printf  "\nCACHES = {    'default': {        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',        'LOCATION': 'memcached:11211',    },}\n" >> $HORIZON_BASEDIR/openstack_dashboard/local/local_settings.py && \
+  printf  "\nAVAILABLE_THEMES = [    (          'cloudbase','Cloudbase','themes/cloudbase'      ),  ]\n" >> $HORIZON_BASEDIR/openstack_dashboard/local/local_settings.py && \
   python3 ./manage.py collectstatic --noinput && \
   python3 ./manage.py compress --force && \
   python3 ./manage.py make_web_conf --wsgi && \
